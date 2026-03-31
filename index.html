@@ -1,166 +1,319 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
+    <link rel="icon" href="favicon.png" type="image/x-icon">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>西寧_小工具</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>西寧二小工具</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#fbfbfd">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0d0d12; color: #e4e4e7; padding: 20px; margin: 0; line-height: 1.5; }
-        .navbar-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; }
-        .nav-button { background-color: #27272a; color: #a1a1aa; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
-        .nav-button.active { background-color: #3b82f6; color: white; }
-        
-        .container { max-width: 480px; margin: auto; background: #18181b; padding: 24px; border-radius: 16px; border: 1px solid #27272a; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); }
-        .page { display: none; }
-        .page.active { display: block; }
+        :root {
+            --glass: rgba(255, 255, 255, 0.7);
+            --liquid-purple: #9370db;
+            --ios-blue: #007AFF;
+            --text-main: #1c1c1e;
+            --bg-color: #fbfbfd;
+            --glass-stroke: rgba(255,255,255,0.4);
+            --tab-active-bg: rgba(0, 122, 255, 0.35);
+        }
+        [data-theme="dark"] {
+            --glass: rgba(28, 28, 30, 0.7);
+            --text-main: #ffffff;
+            --bg-color: #000000;
+            --glass-stroke: rgba(255,255,255,0.1);
+            --tab-active-bg: rgba(0, 122, 255, 0.5);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+            margin: 0;
+            background: var(--bg-color);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-main);
+        }
+        .liquid-bg {
+            position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 30%, #e0c3fc 0%, var(--bg-color) 50%),
+                        radial-gradient(circle at 70% 70%, #8ec5fc 0%, var(--bg-color) 50%);
+            z-index: -1; filter: blur(80px);
+            animation: flow 15s infinite alternate ease-in-out;
+        }
+        [data-theme="dark"] .liquid-bg {
+            background: radial-gradient(circle at 30% 30%, #2c0b4a 0%, #000 50%),
+                        radial-gradient(circle at 70% 70%, #0a2342 0%, #000 50%);
+        }
+        @keyframes flow { from { transform: rotate(0deg); } to { transform: rotate(15deg) scale(1.1); } }
 
-        .section-title { font-size: 14px; color: #71717a; margin: 20px 0 10px; border-bottom: 1px solid #27272a; padding-bottom: 5px; }
-        .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; background: #27272a; padding: 12px; border-radius: 10px; }
-        .hint { font-size: 12px; color: #f87171; margin-bottom: 10px; display: block; }
-        
-        input { background: #09090b; border: 1px solid #3f3f46; color: white; padding: 8px; border-radius: 6px; width: 70px; text-align: center; font-size: 16px; }
-        input:focus { border-color: #3b82f6; outline: none; }
-        .wide-input { width: 120px; }
-        
+        /* 原有 Tab 樣式 */
+        .tab-bar { position: sticky; top: env(safe-area-inset-top); z-index: 200; background: var(--glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-stroke); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; }
+        .tab-list { flex: 1; display: flex; overflow-x: auto; gap: 12px; padding-right: 120px; }
+        .tab-item {
+            padding: 8px 14px; font-size: 17px; font-weight: 600; white-space: nowrap;
+            border-radius: 12px; background: rgba(150,150,150,0.08); border: 1px solid rgba(150,150,150,0.15);
+            transition: all 0.3s ease, transform 0.15s ease; cursor: pointer;
+        }
+        .tab-item.active { background: var(--tab-active-bg); color: var(--ios-blue); border-color: var(--ios-blue); }
+        .tab-item.clicked { transform: scale(0.92); }
+        .tab-item.shake { animation: shake 0.4s ease-in-out forwards; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+        .fixed-right { display: flex; align-items: center; gap: 8px; }
+        .theme-toggle-container { width: 54px; height: 30px; background: #28a745; border-radius: 999px; cursor: pointer; position: relative; }
+        .theme-toggle-container.off { background: #6c757d; }
+        .theme-toggle-knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s; }
+        .theme-toggle-container.on .theme-toggle-knob { transform: translateX(24px); }
+
+        #nav-container { flex: 1; position: relative; display: flex; flex-direction: column; overflow: hidden; }
+        header { padding: 20px 24px 8px; }
+        header h1 { font-size: 34px; font-weight: 700; margin: 0; }
+        header p { color: #8e8e93; font-size: 17px; }
+
+        .view-stack { flex: 1; position: relative; overflow: hidden; padding: 0 20px; }
+        .step-view { position: absolute; inset: 0; overflow-y: auto; display: none; flex-direction: column; }
+        .step-view.active { display: flex; animation: slideIn 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(25px); border-radius: 20px;
+            border: 1px solid var(--glass-stroke); padding: 20px; margin-bottom: 20px;
+        }
+        .back-btn { color: var(--ios-blue); font-size: 17px; margin: 10px 0; cursor: pointer; }
+
+        /* === 薪資試算專用樣式 === */
+        .salary-title { text-align: center; margin: 10px 0 20px; color: var(--liquid-purple); }
+        .input-group { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; font-size: 17px; }
+        .input-group label, .input-group span { flex: 1; }
+        .wide-input { width: 100%; padding: 12px; font-size: 18px; border-radius: 12px; border: 1px solid var(--glass-stroke); background: rgba(255,255,255,0.4); }
+        .section-title { font-weight: 600; margin: 25px 0 8px; font-size: 18px; }
+        .hint { font-size: 14px; color: #8e8e93; margin-bottom: 10px; display: block; }
         .ctrl-group { display: flex; align-items: center; gap: 8px; }
-        .ctrl-btn { background: #3f3f46; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .ctrl-btn:hover { background: #52525b; }
-        
-        .calc-btn { width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px; transition: 0.2s; }
-        .calc-btn:hover { background: #2563eb; }
-
-        #resultBox { margin-top: 25px; padding: 20px; background: #09090b; border-radius: 12px; border: 1px solid #3b82f6; display: none; }
-        #mainResult { font-size: 24px; font-weight: 800; color: #4ade80; text-align: center; margin-bottom: 15px; }
-        .log-container { font-family: monospace; font-size: 13px; color: #a1a1aa; white-space: pre-line; border-top: 1px solid #27272a; padding-top: 15px; }
+        .ctrl-btn {
+            width: 36px; height: 36px; border-radius: 50%; background: var(--ios-blue); color: white;
+            border: none; font-size: 20px; display: flex; align-items: center; justify-content: center;
+        }
+        .calc-btn {
+            width: 100%; padding: 18px; background: var(--ios-blue); color: white;
+            border: none; border-radius: 15px; font-size: 18px; font-weight: 600; margin: 25px 0;
+        }
+        #resultBox { margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.6); color: white; border-radius: 16px; display: none; }
+        #mainResult { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 15px; }
+        .log-container { white-space: pre-wrap; font-size: 15px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
     </style>
 </head>
-<body>
+<body data-theme="light">
+<div class="liquid-bg"></div>
 
-    <div class="navbar-container">
-        <button class="nav-button" onclick="location.reload()">鞋碼轉換</button>
-        <button class="nav-button active">薪資計算(PT)</button>
+<div class="tab-bar">
+    <div class="tab-list">
+        <div class="tab-item active" data-tab="shoe" onclick="clickFeedback(this, () => switchTab('shoe'))">鞋碼轉換</div>
+        <div class="tab-item" data-tab="product" onclick="clickFeedback(this, () => switchTab('product'))">產品知識查詢</div>
+        <div class="tab-item" data-tab="salary" onclick="clickFeedback(this, () => switchTab('salary'))">薪資試算(PT)</div>
+        <div class="tab-item" data-tab="clothing" onclick="clickFeedback(this, () => switchTab('clothing'))">服飾尺碼</div>
+        <div class="tab-item" data-tab="todo" onclick="clickFeedback(this, () => switchTab('todo'))">待開發</div>
     </div>
 
-    <div class="container">
-        <h2 style="text-align: center; margin-top: 0;">薪資計算器</h2>
-        
-        <div class="input-group">
-            <label>每小時薪資 (元)</label>
-            <input type="number" id="hourlyWage" class="wide-input" value="196">
+    <div class="fixed-right">
+        <div class="tab-item fixed feedback-icon" data-tab="feedback" onclick="clickFeedback(this, () => switchTab('feedback'))">💬</div>
+        <div class="theme-toggle-container" id="themeToggle" onclick="toggleTheme()">
+            <div class="theme-toggle-knob"></div>
         </div>
+    </div>
+</div>
 
-        <div class="section-title">班別時數 (未扣休息)</div>
-        <span class="hint">※ 請輸入班表上的原始時數</span>
-        
-        <div id="shiftList">
-            <div class="input-group"><span>9 小時班</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('h9',-1)">-</button><input type="number" id="h9" value="0"><button class="ctrl-btn" onclick="adj('h9',1)">+</button></div></div>
-            <div class="input-group"><span>8 小時班</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('h8',-1)">-</button><input type="number" id="h8" value="0"><button class="ctrl-btn" onclick="adj('h8',1)">+</button></div></div>
-            <div class="input-group"><span>5 小時班</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('h5',-1)">-</button><input type="number" id="h5" value="0"><button class="ctrl-btn" onclick="adj('h5',1)">+</button></div></div>
-        </div>
+<div id="nav-container">
+    <header>
+        <h1 id="title-text">西寧二小工具</h1>
+        <p id="sub-text">客人提供的鞋款類型</p>
+    </header>
 
-        <div id="otherContainer">
-            <div class="input-group other-row">
-                <input type="number" class="o-h" placeholder="時數" style="width: 60px;" oninput="addNewOther(this)">
-                <span>時 / </span>
-                <div class="ctrl-group"><button class="ctrl-btn" onclick="adjEl(this,-1)">-</button><input type="number" class="o-c" value="0"><button class="ctrl-btn" onclick="adjEl(this,1)">+</button> 次</div>
+    <div class="view-stack">
+
+        <!-- 原有鞋碼轉換 View（省略中間不變的部分，保留你原本的 view1~view6） -->
+        <!-- ... 你原本的 view1 ~ view6 ... -->
+
+        <!-- ==================== 新增：薪資試算 View ==================== -->
+        <div id="view7" class="step-view">
+            <div class="back-btn" onclick="goBack(1)">← 返回主頁</div>
+            <div class="glass-card">
+                <h2 class="salary-title">薪資計算器 (PT)</h2>
+                
+                <div class="input-group">
+                    <label>每小時薪資 (元)</label>
+                    <input type="number" id="hourlyWage" class="wide-input" value="196">
+                </div>
+
+                <div class="section-title">班別時數 (未扣休息)</div>
+                <span class="hint">※ 請輸入班表上的原始時數</span>
+                
+                <div id="shiftList">
+                    <div class="input-group"><span>9 小時班</span> 
+                        <div class="ctrl-group">
+                            <button class="ctrl-btn" onclick="adj('h9',-1)">-</button>
+                            <input type="number" id="h9" value="0" style="width:60px;text-align:center;">
+                            <button class="ctrl-btn" onclick="adj('h9',1)">+</button>
+                        </div>
+                    </div>
+                    <div class="input-group"><span>8 小時班</span> 
+                        <div class="ctrl-group">
+                            <button class="ctrl-btn" onclick="adj('h8',-1)">-</button>
+                            <input type="number" id="h8" value="0" style="width:60px;text-align:center;">
+                            <button class="ctrl-btn" onclick="adj('h8',1)">+</button>
+                        </div>
+                    </div>
+                    <div class="input-group"><span>5 小時班</span> 
+                        <div class="ctrl-group">
+                            <button class="ctrl-btn" onclick="adj('h5',-1)">-</button>
+                            <input type="number" id="h5" value="0" style="width:60px;text-align:center;">
+                            <button class="ctrl-btn" onclick="adj('h5',1)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">額外加班時數</div>
+                <div class="input-group"><span>0-4 小時加成 (x0.34)</span> 
+                    <div class="ctrl-group">
+                        <button class="ctrl-btn" onclick="adj('ot1',-1)">-</button>
+                        <input type="number" id="ot1" value="0" step="0.5" style="width:70px;text-align:center;">
+                        <button class="ctrl-btn" onclick="adj('ot1',1)">+</button>
+                    </div>
+                </div>
+                <div class="input-group"><span>5-8 小時加成 (x0.67)</span> 
+                    <div class="ctrl-group">
+                        <button class="ctrl-btn" onclick="adj('ot2',-1)">-</button>
+                        <input type="number" id="ot2" value="0" step="0.5" style="width:70px;text-align:center;">
+                        <button class="ctrl-btn" onclick="adj('ot2',1)">+</button>
+                    </div>
+                </div>
+
+                <button class="calc-btn" onclick="runCalculation()">計算實領薪資</button>
+
+                <div id="resultBox">
+                    <div id="mainResult"></div>
+                    <div id="logArea" class="log-container"></div>
+                </div>
             </div>
         </div>
 
-        <div class="section-title">額外加班時數</div>
-        <div class="input-group"><span>0-4 小時加成 (x0.34)</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('ot1',-1)">-</button><input type="number" id="ot1" value="0" step="0.5"><button class="ctrl-btn" onclick="adj('ot1',1)">+</button></div></div>
-        <div class="input-group"><span>5-8 小時加成 (x0.67)</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('ot2',-1)">-</button><input type="number" id="ot2" value="0" step="0.5"><button class="ctrl-btn" onclick="adj('ot2',1)">+</button></div></div>
-
-        <button class="calc-btn" onclick="runCalculation()">計算實領薪資</button>
-
-        <div id="resultBox">
-            <div id="mainResult"></div>
-            <div id="logArea" class="log-container"></div>
-        </div>
     </div>
+</div>
 
-    <script>
-        const rangeTable = [
-            { max: 11100, labor: 277, health: 458 }, { max: 12540, labor: 313, health: 458 },
-            { max: 13500, labor: 338, health: 458 }, { max: 15840, labor: 396, health: 458 },
-            { max: 16500, labor: 413, health: 458 }, { max: 17280, labor: 432, health: 458 },
-            { max: 17880, labor: 447, health: 458 }, { max: 19047, labor: 476, health: 458 },
-            { max: 20008, labor: 500, health: 458 }, { max: 21009, labor: 525, health: 458 },
-            { max: 22000, labor: 550, health: 458 }, { max: 23100, labor: 577, health: 458 },
-            { max: 24000, labor: 600, health: 458 }, { max: 25250, labor: 632, health: 458 },
-            { max: 26400, labor: 660, health: 458 }, { max: 27600, labor: 690, health: 458 },
-            { max: 28590, labor: 715, health: 458 }, { max: 29500, labor: 738, health: 458 },
-            { max: 30300, labor: 758, health: 470 }, { max: 31800, labor: 795, health: 493 },
-            { max: 33300, labor: 833, health: 516 }, { max: 34800, labor: 870, health: 540 },
-            { max: 36300, labor: 908, health: 563 }, { max: 38200, labor: 955, health: 592 },
-            { max: 40100, labor: 1002, health: 622 }, { max: 42000, labor: 1050, health: 651 },
-            { max: 43900, labor: 1098, health: 681 }, { max: 999999, labor: 1145, health: 710 }
-        ];
+<script>
+// ==================== 原有所有程式碼 (鞋碼、產品查詢、意見回饋等) ====================
+// ... (把你之前完整版的所有 script 內容貼上) ...
 
-        function adj(id, v) { 
-            let e = document.getElementById(id);
-            e.value = Math.max(0, (parseFloat(e.value) || 0) + v);
-        }
+// ==================== 新增：薪資試算相關程式碼 ====================
+const rangeTable = [
+    { max: 11100, labor: 277, health: 458 }, { max: 12540, labor: 313, health: 458 },
+    { max: 13500, labor: 338, health: 458 }, { max: 15840, labor: 396, health: 458 },
+    { max: 16500, labor: 413, health: 458 }, { max: 17280, labor: 432, health: 458 },
+    { max: 17880, labor: 447, health: 458 }, { max: 19047, labor: 476, health: 458 },
+    { max: 20008, labor: 500, health: 458 }, { max: 21009, labor: 525, health: 458 },
+    { max: 22000, labor: 550, health: 458 }, { max: 23100, labor: 577, health: 458 },
+    { max: 24000, labor: 600, health: 458 }, { max: 25250, labor: 632, health: 458 },
+    { max: 26400, labor: 660, health: 458 }, { max: 27600, labor: 690, health: 458 },
+    { max: 28590, labor: 715, health: 458 }, { max: 29500, labor: 738, health: 458 },
+    { max: 30300, labor: 758, health: 470 }, { max: 31800, labor: 795, health: 493 },
+    { max: 33300, labor: 833, health: 516 }, { max: 34800, labor: 870, health: 540 },
+    { max: 36300, labor: 908, health: 563 }, { max: 38200, labor: 955, health: 592 },
+    { max: 40100, labor: 1002, health: 622 }, { max: 42000, labor: 1050, health: 651 },
+    { max: 43900, labor: 1098, health: 681 }, { max: 999999, labor: 1145, health: 710 }
+];
 
-        function adjEl(btn, v) {
-            let e = btn.parentNode.querySelector('input');
-            e.value = Math.max(0, (parseInt(e.value) || 0) + v);
-        }
+function adj(id, v) { 
+    let e = document.getElementById(id);
+    if(e) e.value = Math.max(0, (parseFloat(e.value) || 0) + v);
+}
 
-        function addNewOther(input) {
-            let rows = document.querySelectorAll('.other-row');
-            if (input.value !== "" && input === rows[rows.length-1].querySelector('.o-h')) {
-                let cln = rows[rows.length-1].cloneNode(true);
-                cln.querySelectorAll('input').forEach(i => i.value = (i.className === 'o-c' ? 0 : ""));
-                document.getElementById('otherContainer').appendChild(cln);
-            }
-        }
+function runCalculation() {
+    let wage = parseFloat(document.getElementById('hourlyWage').value) || 0;
+    let log = "--- 計算細節 ---\n";
+    let totalCleanHours = 0;
 
-        function runCalculation() {
-            let wage = parseFloat(document.getElementById('hourlyWage').value) || 0;
-            let log = "--- 計算細節 ---\n";
-            let totalCleanHours = 0;
+    let shifts = [
+        { h: 9, c: parseInt(document.getElementById('h9').value) || 0 },
+        { h: 8, c: parseInt(document.getElementById('h8').value) || 0 },
+        { h: 5, c: parseInt(document.getElementById('h5').value) || 0 }
+    ];
 
-            let shifts = [
-                { h: 9, c: parseInt(document.getElementById('h9').value) || 0 },
-                { h: 8, c: parseInt(document.getElementById('h8').value) || 0 },
-                { h: 5, c: parseInt(document.getElementById('h5').value) || 0 }
-            ];
+    let totalPay = 0;
+    shifts.forEach(s => {
+        if (s.c <= 0) return;
+        let rest = s.h > 8 ? 1 : (s.h > 4 ? 0.5 : 0);
+        let clean = s.h - rest;
+        totalCleanHours += clean * s.c;
+        log += `📍 ${s.h}時班 x ${s.c}次 = ${clean * s.c}時\n`;
+    });
 
-            document.querySelectorAll('.other-row').forEach(r => {
-                let h = parseFloat(r.querySelector('.o-h').value);
-                let c = parseInt(r.querySelector('.o-c').value);
-                if(h > 0 && c > 0) shifts.push({h, c});
-            });
+    let basePay = totalCleanHours * wage;
+    log += `💰 基本薪資: ${totalCleanHours}時 × ${wage}元 = ${Math.round(basePay)}元\n`;
 
-            shifts.forEach(s => {
-                if (s.c <= 0) return;
-                let rest = s.h > 8 ? 1 : (s.h > 4 ? 0.5 : 0);
-                let clean = s.h - rest;
-                totalCleanHours += (clean * s.c);
-                log += `📍 ${s.h}時班: (${s.h} - 休息${rest}) x ${s.c}次 = ${clean * s.c}時\n`;
-            });
+    let ot1 = (parseFloat(document.getElementById('ot1').value) || 0) * (wage * 0.34);
+    let ot2 = (parseFloat(document.getElementById('ot2').value) || 0) * (wage * 0.67);
+    totalPay = Math.round(basePay + ot1 + ot2);
+    
+    if(ot1 + ot2 > 0) log += `➕ 加班津貼: ${Math.round(ot1 + ot2)}元\n`;
+    log += `合計總薪資: ${totalPay}元\n`;
 
-            let basePay = totalCleanHours * wage;
-            log += `💰 基本薪資: ${totalCleanHours}時 x ${wage}元 = ${Math.round(basePay)}元\n`;
+    let ins = rangeTable.find(i => totalPay <= i.max) || rangeTable[rangeTable.length-1];
+    let final = totalPay - ins.labor - ins.health;
 
-            let ot1 = (parseFloat(document.getElementById('ot1').value) || 0) * (wage * 0.34);
-            let ot2 = (parseFloat(document.getElementById('ot2').value) || 0) * (wage * 0.67);
-            let totalPay = Math.round(basePay + ot1 + ot2);
-            
-            if(ot1+ot2 > 0) log += `➕ 加班津貼: ${Math.round(ot1+ot2)}元\n`;
-            log += `合計總薪資: ${totalPay}元\n`;
+    log += `➖ 勞保: ${ins.labor}元\n➖ 健保: ${ins.health}元\n`;
+    log += `----------------\n實領金額: ${final}元`;
 
-            let ins = rangeTable.find(i => totalPay <= i.max) || rangeTable[rangeTable.length-1];
-            let final = totalPay - ins.labor - ins.health;
+    document.getElementById('mainResult').innerHTML = `實領薪資: <span style="color:#0f0; font-size:32px;">$${final.toLocaleString()}</span>`;
+    document.getElementById('logArea').innerText = log;
+    document.getElementById('resultBox').style.display = "block";
+}
 
-            log += `➖ 勞保扣除: ${ins.labor}元 (級距≤${ins.max})\n`;
-            log += `➖ 健保扣除: ${ins.health}元\n`;
-            log += `----------------\n實領金額: ${totalPay} - ${ins.labor} - ${ins.health} = ${final}元`;
+// ==================== switchTab 更新 ====================
+function switchTab(tab) {
+    document.querySelectorAll('.step-view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
 
-            document.getElementById('mainResult').innerHTML = `實領薪資: <span style="color:#fff">$${final.toLocaleString()}</span>`;
-            document.getElementById('logArea').innerText = log;
-            document.getElementById('resultBox').style.display = "block";
-        }
-    </script>
+    if (tab === 'shoe') {
+        navigateTo(1, "西寧二小工具", "客人提供的鞋款類型");
+    } else if (tab === 'product') {
+        document.getElementById('view6').classList.add('active');
+        document.getElementById('title-text').innerText = "產品知識查詢";
+        document.getElementById('sub-text').innerText = "輸入想查的 Nike 產品吧～";
+    } else if (tab === 'salary') {
+        document.getElementById('view7').classList.add('active');
+        document.getElementById('title-text').innerText = "薪資試算(PT)";
+        document.getElementById('sub-text').innerText = "輸入班表計算實領薪資";
+    } else if (tab === 'feedback') {
+        document.getElementById('view5').classList.add('active');
+        document.getElementById('title-text').innerText = "意見回饋";
+        document.getElementById('sub-text').innerText = "告訴我們你的想法吧~";
+    } else {
+        showComingSoon(tab);
+    }
+
+    document.querySelector(`.tab-item[data-tab="${tab}"]`).classList.add('active');
+}
+
+// clickFeedback 已包含 salary（不震動）
+function clickFeedback(el, callback) {
+    const tab = el.getAttribute('data-tab');
+    if (['shoe','product','salary','feedback'].includes(tab)) {
+        el.classList.add('clicked');
+        setTimeout(() => el.classList.remove('clicked'), 200);
+    } else {
+        el.classList.add('shake');
+        setTimeout(() => el.classList.remove('shake'), 400);
+    }
+    if (callback) callback();
+}
+
+// 初始化
+window.addEventListener('load', () => {
+    initTheme();
+    switchTab('shoe');
+});
+</script>
 </body>
 </html>
