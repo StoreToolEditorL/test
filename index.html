@@ -219,8 +219,6 @@
         </div>
     </div>
 </div>
-
-     </div>
 <script>
 // ==================== 原有所有程式碼 (鞋碼、產品查詢、意見回饋等) ====================
 // ... (把你之前完整版的所有 script 內容貼上) ...
@@ -248,7 +246,30 @@ function adj(id, v) {
     if(e) e.value = Math.max(0, (parseFloat(e.value) || 0) + v);
 }
 
+// 薪資試算相關函式
+
+
+function adjEl(btn, v) {
+    let input = btn.parentNode.querySelector('input');
+    if(input) input.value = Math.max(0, (parseInt(input.value) || 0) + v);
+}
+
+function addNewOther(input) {
+    let container = document.getElementById('otherContainer');
+    let rows = container.querySelectorAll('.other-row');
+    let lastRow = rows[rows.length - 1];
+
+    // 如果最後一行的時數被填寫，就自動新增一行
+    if (input.value !== "" && input === lastRow.querySelector('.o-h')) {
+        let newRow = lastRow.cloneNode(true);
+        newRow.querySelector('.o-h').value = "";
+        newRow.querySelector('.o-c').value = "0";
+        container.appendChild(newRow);
+    }
+}
+
 function runCalculation() {
+
     let wage = parseFloat(document.getElementById('hourlyWage').value) || 0;
     let log = "--- 計算細節 ---\n";
     let totalCleanHours = 0;
