@@ -5,195 +5,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>西寧_小工具</title>
     <style>
-        body { font-family: sans-serif; background-color: #1a1a1d; color: white; padding: 20px; margin: 0; }
-        。navbar-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        。nav-button { background-color: #2d2f34; color: #ccc; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
-        。nav-button.active { background-color: #007bff; color: white; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0d0d12; color: #e4e4e7; padding: 20px; margin: 0; line-height: 1.5; }
+        .navbar-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; }
+        .nav-button { background-color: #27272a; color: #a1a1aa; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
+        .nav-button.active { background-color: #3b82f6; color: white; }
         
-        。container { max-width: 500px; margin: auto; background: #252529; padding: 20px; border-radius: 12px; }
-        。page { display: none; }
-        。page.active { display: block; }
+        .container { max-width: 480px; margin: auto; background: #18181b; padding: 24px; border-radius: 16px; border: 1px solid #27272a; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); }
+        .page { display: none; }
+        .page.active { display: block; }
 
-        。input-group { margin-bottom: 15px; background: #323238; padding: 10px; border-radius: 8px; }
-        。hint { font-size: 12px; color: #aaa; margin-bottom: 5px; }
-        。row { display: flex; align-items: center; justify-content: space-between; margin-top: 5px; }
-        input { background: #1a1a1d; border: 1px solid #555; color: white; padding: 8px; border-radius: 4px; width: 60px; text-align: center; }
-        。wide-input { width: 100px; }
-        button.calc-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        。ctrl-btn { background: #444; color: white; border: none; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; }
+        .section-title { font-size: 14px; color: #71717a; margin: 20px 0 10px; border-bottom: 1px solid #27272a; padding-bottom: 5px; }
+        .input-group { margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; background: #27272a; padding: 12px; border-radius: 10px; }
+        .hint { font-size: 12px; color: #f87171; margin-bottom: 10px; display: block; }
         
-        #resultDisplay { margin-top: 20px; padding: 15px; background: #1a1a1d; border-left: 4px solid #007bff; line-height: 1.6; }
-        。process-log { font-size: 13px; color: #bbb; white-space: pre-line; margin-top: 10px; border-top: 1px solid #444; padding-top: 10px; }
+        input { background: #09090b; border: 1px solid #3f3f46; color: white; padding: 8px; border-radius: 6px; width: 70px; text-align: center; font-size: 16px; }
+        input:focus { border-color: #3b82f6; outline: none; }
+        .wide-input { width: 120px; }
+        
+        .ctrl-group { display: flex; align-items: center; gap: 8px; }
+        .ctrl-btn { background: #3f3f46; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .ctrl-btn:hover { background: #52525b; }
+        
+        .calc-btn { width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 20px; transition: 0.2s; }
+        .calc-btn:hover { background: #2563eb; }
+
+        #resultBox { margin-top: 25px; padding: 20px; background: #09090b; border-radius: 12px; border: 1px solid #3b82f6; display: none; }
+        #mainResult { font-size: 24px; font-weight: 800; color: #4ade80; text-align: center; margin-bottom: 15px; }
+        .log-container { font-family: monospace; font-size: 13px; color: #a1a1aa; white-space: pre-line; border-top: 1px solid #27272a; padding-top: 15px; }
     </style>
 </head>
 <body>
 
     <div class="navbar-container">
-        <button class="nav-button" onclick="showPage('shoe')">鞋碼轉換</button>
-        <button class="nav-button active" onclick="showPage('salary')">薪資計算(PT)</button>
+        <button class="nav-button" onclick="location.reload()">鞋碼轉換</button>
+        <button class="nav-button active">薪資計算(PT)</button>
     </div>
 
-    <div id="shoePage" class="page container">
-        <h1>鞋碼轉換器 (原本內容)</h1>
-        </div>
-
-    <div id="salaryPage" class="page container active">
-        <h1>薪資計算 (PT)</h1>
+    <div class="container">
+        <h2 style="text-align: center; margin-top: 0;">薪資計算器</h2>
         
         <div class="input-group">
-            <label>每小時薪資：</label>
+            <label>每小時薪資 (元)</label>
             <input type="number" id="hourlyWage" class="wide-input" value="196">
         </div>
 
-        <div class="hint">工作時數：請輸入班別時數 (未扣除休息時間)</div>
+        <div class="section-title">班別時數 (未扣休息)</div>
+        <span class="hint">※ 請輸入班表上的原始時數</span>
         
-        <div id="fixedShifts">
-            <div class="row"><span>9 小時班</span> <div><button class="ctrl-btn" onclick="adj('h9',-1)">-</button> <input type="number" id="h9" value="0"> <button class="ctrl-btn" onclick="adj('h9',1)">+</button> 次</div></div>
-            <div class="row"><span>8 小時班</span> <div><button class="ctrl-btn" onclick="adj('h8',-1)">-</button> <input type="number" id="h8" value="0"> <button class="ctrl-btn" onclick="adj('h8',1)">+</button> 次</div></div>
-            <div class="row"><span>5 小時班</span> <div><button class="ctrl-btn" onclick="adj('h5',-1)">-</button> <input type="number" id="h5" value="0"> <button class="ctrl-btn" onclick="adj('h5',1)">+</button> 次</div></div>
+        <div id="shiftList">
+            <div class="input-group"><span>9 小時班</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('h9',-1)">-</button><input type="number" id="h9" value="0"><button class="ctrl-btn" onclick="adj('h9',1)">+</button></div></div>
+            <div class="input-group"><span>8 小時班</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('h8',-1)">-</button><input type="number" id="h8" value="0"><button class="ctrl-btn" onclick="adj('h8',1)">+</button></div></div>
+            <div class="input-group"><span>5 小時班</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('h5',-1)">-</button><input type="number" id="h5" value="0"><button class="ctrl-btn" onclick="adj('h5',1)">+</button></div></div>
         </div>
 
-        <div id="otherShiftsContainer">
-            <div class="row" style="margin-top:15px; color:#aaa;">其他時數：</div>
-            <div class="row other-row">
-                <input type="number" class="other-h" placeholder="時數" oninput="checkNewOther(this)"> 
+        <div id="otherContainer">
+            <div class="input-group other-row">
+                <input type="number" class="o-h" placeholder="時數" style="width: 60px;" oninput="addNewOther(this)">
                 <span>時 / </span>
-                <div><button class="ctrl-btn" onclick="adjEl(this,-1)">-</button> <input type="number" class="other-c" value="0"> <button class="ctrl-btn" onclick="adjEl(this,1)">+</button> 次</div>
+                <div class="ctrl-group"><button class="ctrl-btn" onclick="adjEl(this,-1)">-</button><input type="number" class="o-c" value="0"><button class="ctrl-btn" onclick="adjEl(this,1)">+</button> 次</div>
             </div>
         </div>
 
-        <div class="input-group" style="margin-top:20px;">
-            <div class="row"><span>加班 0-4h (x0.34)</span> <div><button class="ctrl-btn" onclick="adj('ot1',-1)">-</button> <input type="number" id="ot1" value="0"> <button class="ctrl-btn" onclick="adj('ot1',1)">+</button> 小時</div></div>
-            <div class="row"><span>加班 5-8h (x0.67)</span> <div><button class="ctrl-btn" onclick="adj('ot2',-1)">-</button> <input type="number" id="ot2" value="0"> <button class="ctrl-btn" onclick="adj('ot2',1)">+</button> 小時</div></div>
-        </div>
+        <div class="section-title">額外加班時數</div>
+        <div class="input-group"><span>0-4 小時加成 (x0.34)</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('ot1',-1)">-</button><input type="number" id="ot1" value="0" step="0.5"><button class="ctrl-btn" onclick="adj('ot1',1)">+</button></div></div>
+        <div class="input-group"><span>5-8 小時加成 (x0.67)</span> <div class="ctrl-group"><button class="ctrl-btn" onclick="adj('ot2',-1)">-</button><input type="number" id="ot2" value="0" step="0.5"><button class="ctrl-btn" onclick="adj('ot2',1)">+</button></div></div>
 
-        <button class="calc-btn" onclick="calculateSalary()">開始計算</button>
+        <button class="calc-btn" onclick="runCalculation()">計算實領薪資</button>
 
-        <div id="resultDisplay" style="display:none;">
-            <div id="mainResult" style="font-size:20px; font-weight:bold; color:#00ff88;"></div>
-            <div id="processLog" class="process-log"></div>
+        <div id="resultBox">
+            <div id="mainResult"></div>
+            <div id="logArea" class="log-container"></div>
         </div>
     </div>
 
     <script>
-        // 勞健保級距表 (依據你的圖片數據)
-        const insuranceTable = [
-            { min: 0, max: 11100, labor: 277, health: 458 },
-            { min: 11101, max: 12540, labor: 313, health: 458 },
-            { min: 12541, max: 13500, labor: 338, health: 458 },
-            { min: 13501, max: 15840, labor: 396, health: 458 },
-            { min: 15841, max: 16500, labor: 413, health: 458 },
-            { min: 16501, max: 17280, labor: 432, health: 458 },
-            { min: 17281, max: 17880, labor: 447, health: 458 },
-            { min: 17881, max: 19047, labor: 476, health: 458 },
-            { min: 19048, max: 20008, labor: 500, health: 458 },
-            { min: 20009, max: 21009, labor: 525, health: 458 },
-            { min: 21010, max: 22000, labor: 550, health: 458 },
-            { min: 22001, max: 23100, labor: 577, health: 458 },
-            { min: 23101, max: 24000, labor: 600, health: 458 },
-            { min: 24001, max: 25250, labor: 632, health: 458 },
-            { min: 25251, max: 26400, labor: 660, health: 458 },
-            { min: 26401, max: 27600, labor: 690, health: 458 },
-            { min: 27601, max: 28590, labor: 715, health: 458 },
-            { min: 28591, max: 29500, labor: 738, health: 458 },
-            { min: 29501, max: 30300, labor: 758, health: 470 },
-            { min: 30301, max: 31800, labor: 795, health: 493 },
-            { min: 31801, max: 33300, labor: 833, health: 516 },
-            { min: 33301, max: 34800, labor: 870, health: 540 },
-            { min: 34801, max: 36300, labor: 908, health: 563 },
-            { min: 36301, max: 38200, labor: 955, health: 592 },
-            { min: 38201, max: 40100, labor: 1002, health: 622 },
-            { min: 40101, max: 42000, labor: 1050, health: 651 },
-            { min: 42001, max: 43900, labor: 1098, health: 681 },
-            { min: 43901, max: 999999, labor: 1145, health: 710 }
+        const rangeTable = [
+            { max: 11100, labor: 277, health: 458 }, { max: 12540, labor: 313, health: 458 },
+            { max: 13500, labor: 338, health: 458 }, { max: 15840, labor: 396, health: 458 },
+            { max: 16500, labor: 413, health: 458 }, { max: 17280, labor: 432, health: 458 },
+            { max: 17880, labor: 447, health: 458 }, { max: 19047, labor: 476, health: 458 },
+            { max: 20008, labor: 500, health: 458 }, { max: 21009, labor: 525, health: 458 },
+            { max: 22000, labor: 550, health: 458 }, { max: 23100, labor: 577, health: 458 },
+            { max: 24000, labor: 600, health: 458 }, { max: 25250, labor: 632, health: 458 },
+            { max: 26400, labor: 660, health: 458 }, { max: 27600, labor: 690, health: 458 },
+            { max: 28590, labor: 715, health: 458 }, { max: 29500, labor: 738, health: 458 },
+            { max: 30300, labor: 758, health: 470 }, { max: 31800, labor: 795, health: 493 },
+            { max: 33300, labor: 833, health: 516 }, { max: 34800, labor: 870, health: 540 },
+            { max: 36300, labor: 908, health: 563 }, { max: 38200, labor: 955, health: 592 },
+            { max: 40100, labor: 1002, health: 622 }, { max: 42000, labor: 1050, health: 651 },
+            { max: 43900, labor: 1098, health: 681 }, { max: 999999, labor: 1145, health: 710 }
         ];
 
-        function showPage(p) {
-            document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(p + 'Page').classList.add('active');
-            event.target.classList.add('active');
+        function adj(id, v) { 
+            let e = document.getElementById(id);
+            e.value = Math.max(0, (parseFloat(e.value) || 0) + v);
         }
 
-        function adj(id, val) {
-            let el = document.getElementById(id);
-            el.value = Math.max(0, parseInt(el.value || 0) + val);
+        function adjEl(btn, v) {
+            let e = btn.parentNode.querySelector('input');
+            e.value = Math.max(0, (parseInt(e.value) || 0) + v);
         }
 
-        function adjEl(btn, val) {
-            let el = btn.parentNode.querySelector('input');
-            el.value = Math.max(0, parseInt(el.value || 0) + val);
-        }
-
-        function checkNewOther(input) {
-            let container = document.getElementById('otherShiftsContainer');
-            let rows = container.querySelectorAll('.other-row');
-            let lastRow = rows[rows.length - 1];
-            if (input.value !== "" && input === lastRow.querySelector('.other-h')) {
-                let newRow = lastRow.cloneNode(true);
-                newRow.querySelectorAll('input').forEach(i => i.value = (i.type === "number" && i.classList.contains('other-c') ? 0 : ""));
-                container.appendChild(newRow);
+        function addNewOther(input) {
+            let rows = document.querySelectorAll('.other-row');
+            if (input.value !== "" && input === rows[rows.length-1].querySelector('.o-h')) {
+                let cln = rows[rows.length-1].cloneNode(true);
+                cln.querySelectorAll('input').forEach(i => i.value = (i.className === 'o-c' ? 0 : ""));
+                document.getElementById('otherContainer').appendChild(cln);
             }
         }
 
-        function calculateSalary() {
+        function runCalculation() {
             let wage = parseFloat(document.getElementById('hourlyWage').value) || 0;
-            let log = "【計算過程】\n";
-            let totalActualHours = 0;
-            let totalShiftPay = 0;
+            let log = "--- 計算細節 ---\n";
+            let totalCleanHours = 0;
 
-            // 處理所有班別 (固定 + 其他)
             let shifts = [
-                { h: 9, c: parseInt(document.getElementById('h9').value) },
-                { h: 8, c: parseInt(document.getElementById('h8').value) },
-                { h: 5, c: parseInt(document.getElementById('h5').value) }
+                { h: 9, c: parseInt(document.getElementById('h9').value) || 0 },
+                { h: 8, c: parseInt(document.getElementById('h8').value) || 0 },
+                { h: 5, c: parseInt(document.getElementById('h5').value) || 0 }
             ];
-            
-            document.querySelectorAll('.other-row').forEach(row => {
-                let h = parseFloat(row.querySelector('.other-h').value);
-                let c = parseInt(row.querySelector('.other-c').value);
-                if (h > 0 && c > 0) shifts.push({ h, c });
+
+            document.querySelectorAll('.other-row').forEach(r => {
+                let h = parseFloat(r.querySelector('.o-h').value);
+                let c = parseInt(r.querySelector('.o-c').value);
+                if(h > 0 && c > 0) shifts.push({h, c});
             });
 
             shifts.forEach(s => {
                 if (s.c <= 0) return;
-                let rest = 0;
-                if (s.h > 8) rest = 1;
-                else if (s.h > 4) rest = 0.5;
-                
-                let actual = s.h - rest;
-                totalActualHours += (actual * s.c);
-                log += `● ${s.h}時班(${s.c}次): 扣除休息${rest}時 -> 淨時數${actual} x ${s.c} = ${actual * s.c}時\n`;
+                let rest = s.h > 8 ? 1 : (s.h > 4 ? 0.5 : 0);
+                let clean = s.h - rest;
+                totalCleanHours += (clean * s.c);
+                log += `📍 ${s.h}時班: (${s.h} - 休息${rest}) x ${s.c}次 = ${clean * s.c}時\n`;
             });
 
-            let basePay = Math.round(totalActualHours * wage);
-            log += `▶ 總工作時數: ${totalActualHours} 小時\n`;
-            log += `▶ 基礎薪資: ${totalActualHours} * ${wage} = ${basePay}元\n`;
+            let basePay = totalCleanHours * wage;
+            log += `💰 基本薪資: ${totalCleanHours}時 x ${wage}元 = ${Math.round(basePay)}元\n`;
 
-            // 加班計算
-            let ot1Hours = parseFloat(document.getElementById('ot1').value) || 0;
-            let ot2Hours = parseFloat(document.getElementById('ot2').value) || 0;
-            let ot1Pay = ot1Hours * (wage * 0.34);
-            let ot2Pay = ot2Hours * (wage * 0.67);
-            let totalOTPay = Math.round(ot1Pay + ot2Pay);
+            let ot1 = (parseFloat(document.getElementById('ot1').value) || 0) * (wage * 0.34);
+            let ot2 = (parseFloat(document.getElementById('ot2').value) || 0) * (wage * 0.67);
+            let totalPay = Math.round(basePay + ot1 + ot2);
             
-            if (ot1Hours > 0) log += `▶ 加班(0-4h): ${ot1Hours}時 x (${wage}x0.34) = ${Math.round(ot1Pay)}元\n`;
-            if (ot2Hours > 0) log += `▶ 加班(5-8h): ${ot2Hours}時 x (${wage}x0.67) = ${Math.round(ot2Pay)}元\n`;
+            if(ot1+ot2 > 0) log += `➕ 加班津貼: ${Math.round(ot1+ot2)}元\n`;
+            log += `合計總薪資: ${totalPay}元\n`;
 
-            let grossPay = basePay + totalOTPay;
-            log += `▶ 總薪資(未扣保費): ${grossPay}元\n`;
+            let ins = rangeTable.find(i => totalPay <= i.max) || rangeTable[rangeTable.length-1];
+            let final = totalPay - ins.labor - ins.health;
 
-            // 勞健保對照
-            let insurance = insuranceTable.find(i => grossPay <= i.max) || insuranceTable[insuranceTable.length-1];
-            let netPay = grossPay - insurance.labor - insurance.health;
+            log += `➖ 勞保扣除: ${ins.labor}元 (級距≤${ins.max})\n`;
+            log += `➖ 健保扣除: ${ins.health}元\n`;
+            log += `----------------\n實領金額: ${totalPay} - ${ins.labor} - ${ins.health} = ${final}元`;
 
-            log += `▶ 勞保扣除: ${insurance.labor}元 (對應級距上限 ${insurance.max})\n`;
-            log += `▶ 健保扣除: ${insurance.health}元\n`;
-            log += `▶ 實領計算: ${grossPay} - ${insurance.labor} - ${insurance.health} = ${netPay}元`;
-
-            document.getElementById('mainResult').innerText = `實領薪資：$${netPay.toLocaleString()}`;
-            document.getElementById('processLog').innerText = log;
-            document.getElementById('resultDisplay').style.display = "block";
+            document.getElementById('mainResult').innerHTML = `實領薪資: <span style="color:#fff">$${final.toLocaleString()}</span>`;
+            document.getElementById('logArea').innerText = log;
+            document.getElementById('resultBox').style.display = "block";
         }
     </script>
 </body>
