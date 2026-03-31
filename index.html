@@ -137,71 +137,90 @@
         <!-- ... 你原本的 view1 ~ view6 ... -->
 
         <!-- ==================== 新增：薪資試算 View ==================== -->
-        <div id="view7" class="step-view">
-            <div class="back-btn" onclick="goBack(1)">← 返回主頁</div>
-            <div class="glass-card">
-                <h2 class="salary-title">薪資計算器 (PT)</h2>
-                
-                <div class="input-group">
-                    <label>每小時薪資 (元)</label>
-                    <input type="number" id="hourlyWage" class="wide-input" value="196">
-                </div>
+<!-- ==================== 薪資試算(PT) ==================== -->
+<div id="view7" class="step-view">
+    <div class="back-btn" onclick="goBack(1)">← 返回主頁</div>
+    <div class="glass-card">
+        <h2 class="salary-title">薪資計算器 (PT)</h2>
+        
+        <div class="input-group">
+            <label>每小時薪資 (元)</label>
+            <input type="number" id="hourlyWage" class="wide-input" value="196">
+        </div>
 
-                <div class="section-title">班別時數 (未扣休息)</div>
-                <span class="hint">※ 請輸入班表上的原始時數</span>
-                
-                <div id="shiftList">
-                    <div class="input-group"><span>9 小時班</span> 
-                        <div class="ctrl-group">
-                            <button class="ctrl-btn" onclick="adj('h9',-1)">-</button>
-                            <input type="number" id="h9" value="0" style="width:60px;text-align:center;">
-                            <button class="ctrl-btn" onclick="adj('h9',1)">+</button>
-                        </div>
-                    </div>
-                    <div class="input-group"><span>8 小時班</span> 
-                        <div class="ctrl-group">
-                            <button class="ctrl-btn" onclick="adj('h8',-1)">-</button>
-                            <input type="number" id="h8" value="0" style="width:60px;text-align:center;">
-                            <button class="ctrl-btn" onclick="adj('h8',1)">+</button>
-                        </div>
-                    </div>
-                    <div class="input-group"><span>5 小時班</span> 
-                        <div class="ctrl-group">
-                            <button class="ctrl-btn" onclick="adj('h5',-1)">-</button>
-                            <input type="number" id="h5" value="0" style="width:60px;text-align:center;">
-                            <button class="ctrl-btn" onclick="adj('h5',1)">+</button>
-                        </div>
-                    </div>
+        <div class="section-title">固定班別</div>
+        <div id="shiftList">
+            <div class="input-group">
+                <span>9 小時班</span> 
+                <div class="ctrl-group">
+                    <button class="ctrl-btn" onclick="adj('h9',-1)">-</button>
+                    <input type="number" id="h9" value="0" style="width:65px;text-align:center;">
+                    <button class="ctrl-btn" onclick="adj('h9',1)">+</button>
                 </div>
-
-                <div class="section-title">額外加班時數</div>
-                <div class="input-group"><span>0-4 小時加成 (x0.34)</span> 
-                    <div class="ctrl-group">
-                        <button class="ctrl-btn" onclick="adj('ot1',-1)">-</button>
-                        <input type="number" id="ot1" value="0" step="0.5" style="width:70px;text-align:center;">
-                        <button class="ctrl-btn" onclick="adj('ot1',1)">+</button>
-                    </div>
+            </div>
+            <div class="input-group">
+                <span>8 小時班</span> 
+                <div class="ctrl-group">
+                    <button class="ctrl-btn" onclick="adj('h8',-1)">-</button>
+                    <input type="number" id="h8" value="0" style="width:65px;text-align:center;">
+                    <button class="ctrl-btn" onclick="adj('h8',1)">+</button>
                 </div>
-                <div class="input-group"><span>5-8 小時加成 (x0.67)</span> 
-                    <div class="ctrl-group">
-                        <button class="ctrl-btn" onclick="adj('ot2',-1)">-</button>
-                        <input type="number" id="ot2" value="0" step="0.5" style="width:70px;text-align:center;">
-                        <button class="ctrl-btn" onclick="adj('ot2',1)">+</button>
-                    </div>
-                </div>
-
-                <button class="calc-btn" onclick="runCalculation()">計算實領薪資</button>
-
-                <div id="resultBox">
-                    <div id="mainResult"></div>
-                    <div id="logArea" class="log-container"></div>
+            </div>
+            <div class="input-group">
+                <span>5 小時班</span> 
+                <div class="ctrl-group">
+                    <button class="ctrl-btn" onclick="adj('h5',-1)">-</button>
+                    <input type="number" id="h5" value="0" style="width:65px;text-align:center;">
+                    <button class="ctrl-btn" onclick="adj('h5',1)">+</button>
                 </div>
             </div>
         </div>
 
+        <!-- 自訂其他班別 -->
+        <div class="section-title">其他自訂班別</div>
+        <span class="hint">※ 可自行新增不同時數的班別</span>
+        
+        <div id="otherContainer">
+            <!-- 第一行預設 -->
+            <div class="other-row">
+                <input type="number" class="o-h" placeholder="時數" style="width:70px;" oninput="addNewOther(this)">
+                <span style="margin:0 8px;">小時 × </span>
+                <div class="ctrl-group">
+                    <button class="ctrl-btn" onclick="adjEl(this,-1)">-</button>
+                    <input type="number" class="o-c" value="0" style="width:55px;text-align:center;">
+                    <button class="ctrl-btn" onclick="adjEl(this,1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">額外加班時數</div>
+        <div class="input-group">
+            <span>0-4 小時加成 (x0.34)</span> 
+            <div class="ctrl-group">
+                <button class="ctrl-btn" onclick="adj('ot1',-1)">-</button>
+                <input type="number" id="ot1" value="0" step="0.5" style="width:70px;text-align:center;">
+                <button class="ctrl-btn" onclick="adj('ot1',1)">+</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <span>5-8 小時加成 (x0.67)</span> 
+            <div class="ctrl-group">
+                <button class="ctrl-btn" onclick="adj('ot2',-1)">-</button>
+                <input type="number" id="ot2" value="0" step="0.5" style="width:70px;text-align:center;">
+                <button class="ctrl-btn" onclick="adj('ot2',1)">+</button>
+            </div>
+        </div>
+
+        <button class="calc-btn" onclick="runCalculation()">計算實領薪資</button>
+
+        <div id="resultBox">
+            <div id="mainResult"></div>
+            <div id="logArea" class="log-container"></div>
+        </div>
     </div>
 </div>
 
+     </div>
 <script>
 // ==================== 原有所有程式碼 (鞋碼、產品查詢、意見回饋等) ====================
 // ... (把你之前完整版的所有 script 內容貼上) ...
